@@ -25,6 +25,16 @@ import catToothpaste from "@/assets/cat-toothpaste.jpg";
 import catSanitizer from "@/assets/cat-sanitizer.jpg";
 import catMasks from "@/assets/cat-masks.jpg";
 import catSoap from "@/assets/cat-soap.jpg";
+import catFirstAid from "@/assets/cat-firstaid.jpg";
+import catOximeter from "@/assets/cat-oximeter.jpg";
+import catPregTest from "@/assets/cat-pregtest.jpg";
+import catPads from "@/assets/cat-pads.jpg";
+import catEyeDrops from "@/assets/cat-eyedrops.jpg";
+import catNasalSpray from "@/assets/cat-nasalspray.jpg";
+import catSunglasses from "@/assets/cat-sunglasses.jpg";
+import catSunscreen from "@/assets/cat-sunscreen.jpg";
+import catEarDrops from "@/assets/cat-eardrops.jpg";
+import catShampoo from "@/assets/cat-shampoo.jpg";
 
 // ── Deterministic RNG (mulberry32) ──────────────────────────────────────────
 function rng(seed: number) {
@@ -55,6 +65,16 @@ const ICON: Record<string, { img: Img; emoji: string; color: string }> = {
   sanitizer:  { img: catSanitizer,  emoji: "🧴", color: "#EAF6FF" },
   masks:      { img: catMasks,      emoji: "😷", color: "#EAF6FF" },
   soap:       { img: catSoap,       emoji: "🧼", color: "#EAF6FF" },
+  firstaid:   { img: catFirstAid,   emoji: "🩹", color: "#FDECEA" },
+  oximeter:   { img: catOximeter,   emoji: "🫁", color: "#E6F4FF" },
+  pregtest:   { img: catPregTest,   emoji: "🧪", color: "#FFE6EE" },
+  pads:       { img: catPads,       emoji: "🌸", color: "#FFE6EE" },
+  eyedrops:   { img: catEyeDrops,   emoji: "👁️", color: "#E6F4FF" },
+  nasalspray: { img: catNasalSpray, emoji: "👃", color: "#E6F4FF" },
+  sunglasses: { img: catSunglasses, emoji: "🕶️", color: "#F0F2F5" },
+  sunscreen:  { img: catSunscreen,  emoji: "☀️", color: "#FFF1DB" },
+  eardrops:   { img: catEarDrops,   emoji: "👂", color: "#FFE9E9" },
+  shampoo:    { img: catShampoo,    emoji: "🧴", color: "#EAF6FF" },
   paracetamol:{ img: prodParacetamol, emoji: "💊", color: "#E8F1FF" },
   amoxicillin:{ img: prodAmoxicillin, emoji: "💊", color: "#E0EBFF" },
   vitc:       { img: prodVitC,        emoji: "🍊", color: "#FFF1DB" },
