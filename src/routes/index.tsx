@@ -235,18 +235,8 @@ function HeroCarousel() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
-// PRODUCT IMAGES — real Unsplash product photos mapped by product id
+// PRODUCT IMAGES sourced from demo-data (PRODUCT_IMAGE)
 // ════════════════════════════════════════════════════════════════════════════════
-export const PRODUCT_IMAGES: Record<string, string> = {
-  p1: prodParacetamol,
-  p2: prodAmoxicillin,
-  p3: prodVitC,
-  p4: prodFormula,
-  p5: prodBP,
-  p6: prodIbuprofen,
-  p7: prodLotion,
-  p8: prodGlucose,
-};
 
 // ════════════════════════════════════════════════════════════════════════════════
 // HOME PAGE
