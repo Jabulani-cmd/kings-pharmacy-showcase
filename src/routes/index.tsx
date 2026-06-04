@@ -35,7 +35,7 @@ const slides = [
 
 // ── Category pills ─────────────────────────────────────────────────────────────
 const categories = [
-  { emoji: "💊", label: "Prescription", route: "/prescriptions" },
+  { emoji: "💊", label: "Prescription", route: "/prescriptions?new=1" },
   { emoji: "🩺", label: "OTC Medicines", route: "/cart" },
   { emoji: "👶", label: "Baby Care", route: "/cart" },
   { emoji: "💆", label: "Vitamins", route: "/cart" },
