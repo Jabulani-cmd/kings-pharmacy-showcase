@@ -39,6 +39,7 @@ export const DEMO_ACCOUNTS: Credential[] = [
   { id: "d3", email: "peter.driver@kingspharmacy.demo", password: "Demo123", firstName: "Peter", lastName: "Chikumba", role: "driver", phone: "+263 77 555 0003", avatar: "PC" },
 
   // Admin
+  { id: "a0", email: "admin@kingspharmacy.co.zw", password: "admin1234", firstName: "Admin", lastName: "Kings", role: "admin", title: "Administrator", avatar: "AK" },
   { id: "a1", email: "admin@kingspharmacy.demo", password: "Demo123", firstName: "Admin", lastName: "Kings", role: "admin", title: "Administrator", avatar: "AK" },
 ];
 
