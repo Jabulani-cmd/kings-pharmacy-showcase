@@ -107,7 +107,7 @@ function HeroCarousel() {
             src={s.img}
             alt=""
             className="w-full h-full object-cover"
-            style={{ objectPosition: "center 20%" }}
+            style={{ objectPosition: "center top" }}
             loading="eager"
             draggable={false}
           />
