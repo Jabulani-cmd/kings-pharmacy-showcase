@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { ShoppingCart, Bell, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { useStore } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
 import type { Product } from "@/lib/store";
 
 type Props = {
