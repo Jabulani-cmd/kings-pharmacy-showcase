@@ -19,10 +19,10 @@ function Account() {
     <div className="max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-8 space-y-5">
       {/* Profile header */}
       <div className="bg-white rounded-2xl p-5 flex items-center gap-4">
-        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#1E5BC6] to-[#1B3A6B] flex items-center justify-center text-white text-2xl font-black">CM</div>
-        <div>
-          <div className="font-black text-xl text-[#1B3A6B]">Chipo Moyo</div>
-          <div className="text-xs text-muted-foreground">Member since 2024 · chipo@example.com</div>
+        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#1E5BC6] to-[#1B3A6B] flex items-center justify-center text-white text-2xl font-black">{initials}</div>
+        <div className="flex-1">
+          <div className="font-black text-xl text-[#1B3A6B]">{user.firstName} {user.lastName}</div>
+          <div className="text-xs text-muted-foreground">Member since 2024 · {user.email}</div>
         </div>
       </div>
 
