@@ -334,10 +334,16 @@ function CardNumber() {
   );
 }
 
-function Confirmed() {
-  const { cart, clear } = useStore();
-  const subtotal = cartSubtotal(cart);
-  const total = subtotal + 2.5;
+function Confirmed({ orderId }: { orderId: string | null }) {
+  const order = useOrders((s) => s.orders.find((o) => o.id === orderId));
+  if (!order) {
+    return (
+      <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 text-center shadow-sm">
+        <div className="text-sm text-muted-foreground">Order not found.</div>
+        <Link to="/shop" className="block mt-5 h-12 rounded-full bg-[#1B3A6B] text-white font-bold leading-[3rem]">Back to shop</Link>
+      </div>
+    );
+  }
   return (
     <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 text-center shadow-sm">
       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", duration: 0.7 }} className="h-24 w-24 mx-auto rounded-full bg-[#1A7A4A] flex items-center justify-center text-white shadow-lg">
@@ -345,16 +351,18 @@ function Confirmed() {
       </motion.div>
       <h1 className="text-2xl font-black text-[#1B3A6B] mt-5">Order Confirmed!</h1>
       <div className="text-sm text-muted-foreground mt-1">Order ref</div>
-      <div className="font-black text-lg text-[#1E5BC6]">#KP-2026-00847</div>
+      <div className="font-black text-lg text-[#1E5BC6]">#{order.id}</div>
 
       <div className="text-left bg-[#F5F7FA] rounded-xl p-4 mt-5 space-y-1 text-sm">
-        <div className="flex justify-between"><span className="text-muted-foreground">Items</span><span className="font-bold">{cart.length}</span></div>
-        <div className="flex justify-between"><span className="text-muted-foreground">Total</span><span className="font-bold">${total.toFixed(2)}</span></div>
-        <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-bold">14 Samora Machel Ave</span></div>
+        <div className="flex justify-between"><span className="text-muted-foreground">Items</span><span className="font-bold">{order.items.length}</span></div>
+        <div className="flex justify-between"><span className="text-muted-foreground">Total</span><span className="font-bold">${order.total.toFixed(2)}</span></div>
+        <div className="flex justify-between"><span className="text-muted-foreground">Payment</span><span className="font-bold">{order.payment}</span></div>
+        <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-bold text-right truncate ml-2">{order.address}</span></div>
         <div className="flex justify-between"><span className="text-muted-foreground">ETA</span><span className="font-bold text-[#1A7A4A]">30-45 minutes</span></div>
       </div>
 
-      <Link to="/track" onClick={() => clear()} className="block mt-5 h-12 rounded-full bg-[#1B3A6B] text-white font-bold leading-[3rem]">Track My Order →</Link>
+      <Link to="/track" search={{ id: order.id } as never} className="block mt-5 h-12 rounded-full bg-[#1B3A6B] text-white font-bold leading-[3rem]">Track My Order →</Link>
     </div>
   );
 }
+
