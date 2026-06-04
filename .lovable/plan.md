@@ -1,64 +1,57 @@
+# Kings Pharmacy — Demo Environment Build Plan
 
-# Kings Pharmacy — Interactive Demo App
+Goal: turn the current shell into a populated, presentation-ready pharmacy ecosystem with realistic data across customer, pharmacy, driver, and admin portals.
 
-A fully responsive, mobile-first pharmacy e-commerce demo with 5 screens and realistic interactive flows (payment OTP, prescription upload, live order tracking). All data mocked in client state — no backend.
+## 1. Seed data layer (`src/lib/demo-data.ts`)
+A single deterministic data module (no backend) the whole UI reads from:
 
-## Scope
+- **Products (120+)** across categories: Medicines (Panado, Disprin, Amoxil, Augmentin, Voltaren, Myprodol, Allergex, Sinutab, Betadine, Calpol, …), Equipment (BP monitor, glucometer, thermometer, nebuliser, wheelchair, walking frame, oxygen concentrator), Baby Care, Vitamins, Personal Care. Each: id, sku, name, brand, category, price, stock, status, description, imageKey.
+- **Customers (50)** — names, phone, email, address, order history refs, reviews, favourites.
+- **Pharmacists (5)** + **Assistants (5)** — role, photo, schedule, rating, orders handled.
+- **Drivers (10)** — photo, vehicle, rating, deliveries completed.
+- **Orders (600+)** — mix of statuses (Pending, Awaiting Review, Approved, Packed, Driver Assigned, Out for Delivery, Delivered, Cancelled) with customer/pharmacist/driver/products/timestamps.
+- **Prescriptions (100)** — statuses Pending/Approved/Rejected/Dispensed.
+- **Reviews (200 each)** for drivers, pharmacists, overall delivery.
+- **Admin KPIs** — sales (day/week/month/year), order counts, customer counts, on-time %, avg delivery time, top products.
 
-- 5 routes: Home, Product Detail, Cart/Checkout, Order Tracking, Account
-- Bottom tab nav on mobile; top nav on desktop
-- Floating cart button + "Demo Mode" pill on all screens
-- Brand colors wired as semantic tokens in `src/styles.css` (oklch)
-- Inter font, uploaded logo used in header
+Generated deterministically with a seeded RNG so numbers stay stable between renders/SSR.
 
-## Routes (TanStack file-based)
+## 2. Product imagery
+Generate ~24 category/product images (medicine blister, syrup bottle, BP monitor, glucometer, thermometer, nebuliser, wheelchair, baby formula, nappies, vitamin C, toothpaste, sanitiser, mask, etc.) and map each product's `imageKey` to the right asset so name↔image always matches. Fall back per-category for products without a dedicated image.
 
-```
-src/routes/
-  __root.tsx           shell + nav + cart drawer + demo badge
-  index.tsx            home/storefront
-  product.$id.tsx      product detail
-  cart.tsx             multi-step checkout
-  track.tsx            live order tracking
-  account.tsx          profile + rewards + prescriptions
-```
+## 3. Hero carousel refresh
+Generate 5 new bright, high-contrast images featuring Black African pharmacists/customers/drivers:
+1. Prescription Delivery Service
+2. Fast Same-Day Delivery
+3. Family Healthcare Solutions
+4. Chronic Medication Management
+5. Online Pharmacy Ordering
 
-## Screen 1 — Home
-Sticky header (logo, search, cart badge, avatar) · 3-slide hero carousel · scrollable category chips · 8 hardcoded products in a 2/4-col grid with stock-status badges and contextual CTAs (Add/Notify/Rx) · flash-sale promo banner.
+Reduce overlay opacity so the photography reads clearly while keeping blue/white branding and CTA legibility.
 
-## Screen 2 — Product Detail
-Large emoji-on-color hero · description, dosage, manufacturer, expiry · qty stepper · Add to Cart · for Rx items: blue prescription banner + mock upload modal (camera/gallery → preview → progress bar → success) · drug-interaction warning · "You may also like" horizontal scroll.
+## 4. Portals & dashboards
+New routes (all populated from the seed module, mobile-first):
 
-## Screen 3 — Cart & Checkout (4 animated steps)
-1. **Cart review** — items, subtotal, $2.50 delivery, total
-2. **Delivery details** — name/phone/address/city/notes, ASAP vs scheduled slot picker
-3. **Payment** — tappable method cards (EcoCash, OneMoney, InnBucks, Telecash, ZIPIT, Visa/MC, COD), each revealing its own form:
-   - Mobile money/InnBucks: phone + PIN → OTP 6-digit entry → Verify & Pay
-   - ZIPIT: bank dropdown + account → Confirm Transfer
-   - Card: formatted card number (4-digit groups), expiry, CVV, name, billing → Pay Securely 🔒
-   - COD: confirmation only
-   - ZiG equivalent shown under USD for mobile-money methods
-4. **Confirmation** — animated ✅, order ref `#KP-2026-00847`, summary, ETA, "Track My Order"
+- `/` — homepage (updated carousel, featured products with correct images, trust strip, top categories).
+- `/account` — customer dashboard: orders, active deliveries, prescriptions, favourites, notifications, reviews.
+- `/track` — live delivery example (driver name, status, distance, ETA) + recent deliveries list.
+- `/cart` & `/product/$id` — keep, wired to the new product list.
+- `/staff` — pharmacy staff dashboard: pending prescriptions, new orders, dispatch queue, inventory alerts, messages.
+- `/driver` — driver dashboard: assigned deliveries, route summary, stats, monthly performance, ratings.
+- `/admin` — executive dashboard: sales overview cards, orders breakdown, customers, delivery performance, top products, recent orders table.
 
-## Screen 4 — Live Order Tracking
-Status banner · 6-step progress stepper (vertical mobile / horizontal desktop) · stylized SVG map with animated 🚗 traveling dashed route to 📍 · driver card (Tinashe M., 5★) · ETA · "Simulate Delivery Progress" button advances stepper + car · "Contact Driver" mock chat popup.
+A simple "Demo Portals" switcher in the header/footer links between the four portals so stakeholders can jump between views.
 
-## Screen 5 — Account
-Chipo Moyo avatar, member since 2024 · Kings Rewards loyalty card (1,240 pts, Gold) · sections: Orders (3 mock), Prescriptions (2 with status), Addresses, Payment Methods, Health Profile (Penicillin allergy, Metformin), Refill Reminders (toggles), Settings, Log Out.
-
-## Cross-cutting
-
-- **State**: Zustand store for cart, prescription upload, tracking step
-- **Stock badges** with exact hex pills, Add-to-Cart disabled when out
-- **Animations**: framer-motion for page fade/slide-up, step transitions, success checkmark, car motion
-- **Logo**: uploaded webp registered via lovable-assets CDN pointer
-- **Responsive**: mobile 375–430 bottom tabs, tablet 768 2-col, desktop 1280 top nav + 4-col
+## 5. Responsive polish
+Verify each new dashboard at mobile, tablet, desktop breakpoints (stack cards, scrollable tables, bottom-tab nav preserved on mobile).
 
 ## Technical notes
+- Pure frontend — no backend/db changes. All data lives in `src/lib/demo-data.ts` and is imported by routes/components.
+- Deterministic seeded generator (small mulberry32) keeps SSR and client output identical.
+- Images go in `src/assets/` (hero-* and prod-*) and are imported as ES modules.
+- Existing `useStore` cart/tracking logic is preserved; product list is replaced by the seed module.
 
-- `src/styles.css` — add tokens: `--brand-navy`, `--brand-royal`, `--brand-success`, `--brand-amber`, `--brand-danger`, `--brand-rx`, plus map to `--color-*`
-- Inter via Google Fonts `@import` in styles.css
-- shadcn primitives used: button, input, dialog, drawer, tabs, badge, card, progress, switch, select, sheet
-- No backend, no Cloud — purely client-mocked
-
-Ready to build on approval.
+## Out of scope (ask if needed)
+- Real auth / multi-tenant role gating (portals are open demo routes).
+- Persisting demo edits (cart still uses zustand in-memory).
+- Real-time updates / websockets for the live tracker (uses simulated state).

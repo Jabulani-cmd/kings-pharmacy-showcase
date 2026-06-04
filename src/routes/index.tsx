@@ -1,21 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
-import { PRODUCTS } from "@/lib/store";
+import { FEATURED_PRODUCTS, PRODUCT_IMAGE } from "@/lib/demo-data";
 import { ProductCard } from "@/components/product-card";
-import { ChevronLeft, ChevronRight, ArrowRight, ShoppingBag, Zap, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Truck, Zap, HeartHandshake, Pill, Smartphone } from "lucide-react";
 import logoAsset from "@/assets/kings-logo.webp.asset.json";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
-import prodParacetamol from "@/assets/prod-paracetamol.jpg";
-import prodAmoxicillin from "@/assets/prod-amoxicillin.jpg";
-import prodVitC from "@/assets/prod-vitc.jpg";
-import prodFormula from "@/assets/prod-formula.jpg";
-import prodBP from "@/assets/prod-bp.jpg";
-import prodIbuprofen from "@/assets/prod-ibuprofen.jpg";
-import prodLotion from "@/assets/prod-lotion.jpg";
-import prodGlucose from "@/assets/prod-glucose.jpg";
+import hero4 from "@/assets/hero-4.jpg";
+import hero5 from "@/assets/hero-5.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,46 +23,14 @@ export const Route = createFileRoute("/")({
 
 const KINGS_LOGO = logoAsset.url;
 
+const OVERLAY = "from-[#153A78]/70 via-[#1E4FA3]/35 to-transparent";
+const BADGE = "bg-white/15 text-white border-white/30";
 const slides = [
-  {
-    id: 0,
-    Icon: Zap,
-    label: "Fast Delivery",
-    title: "Prescriptions\nDelivered Fast",
-    sub: "Order before 5 pm — our pharmacists pack and dispatch to your door in 30 minutes across the city.",
-    cta: "Order Now",
-    route: "/cart",
-    img: hero1,
-    overlay: "from-[#153A78]/85 via-[#1E4FA3]/55 to-[#1E4FA3]/10",
-    accent: "#EAF3FF",
-    badge: "bg-white/15 text-white border-white/30",
-  },
-  {
-    id: 1,
-    Icon: ShoppingBag,
-    label: "Shop Online",
-    title: "200+ Medicines\nIn Stock Today",
-    sub: "Browse our full catalogue of OTC and prescription products. Real stock, real prices, updated live.",
-    cta: "Shop Now",
-    route: "/cart",
-    img: hero2,
-    overlay: "from-[#153A78]/85 via-[#1E4FA3]/55 to-[#1E4FA3]/10",
-    accent: "#EAF3FF",
-    badge: "bg-white/15 text-white border-white/30",
-  },
-  {
-    id: 2,
-    Icon: Crown,
-    label: "Loyalty Rewards",
-    title: "Earn Kings\nRewards Points",
-    sub: "Get 5% back in loyalty points on every order. Redeem for discounts, free delivery, and exclusive offers.",
-    cta: "Join Free Today",
-    route: "/account",
-    img: hero3,
-    overlay: "from-[#153A78]/85 via-[#1E4FA3]/55 to-[#1E4FA3]/10",
-    accent: "#EAF3FF",
-    badge: "bg-white/15 text-white border-white/30",
-  },
+  { id: 0, Icon: Pill,          label: "Prescription Delivery", title: "Prescription\nDelivery Service",   sub: "Upload your script — our pharmacists verify, dispense, and dispatch within the hour.",      cta: "Order Now",      route: "/cart",    img: hero1, overlay: OVERLAY, accent: "#EAF3FF", badge: BADGE },
+  { id: 1, Icon: Zap,           label: "Same-Day Delivery",     title: "Fast Same-Day\nDelivery",          sub: "Order before 5pm and receive your medicines the same day — anywhere in the city.",          cta: "Track Demo",     route: "/track",   img: hero2, overlay: OVERLAY, accent: "#EAF3FF", badge: BADGE },
+  { id: 2, Icon: HeartHandshake,label: "Family Healthcare",     title: "Family Healthcare\nSolutions",     sub: "Trusted by thousands of families. Baby care, OTC, vitamins and clinical support in one place.", cta: "Browse Catalogue", route: "/cart", img: hero3, overlay: OVERLAY, accent: "#EAF3FF", badge: BADGE },
+  { id: 3, Icon: Truck,         label: "Chronic Medication",    title: "Chronic Medication\nManagement",   sub: "Auto-refills, reminders and monthly bundles for hypertension, diabetes and asthma patients.", cta: "Set Up Refills", route: "/account", img: hero4, overlay: OVERLAY, accent: "#EAF3FF", badge: BADGE },
+  { id: 4, Icon: Smartphone,    label: "Online Pharmacy",       title: "Online Pharmacy\nOrdering",        sub: "Browse 100+ products, pay securely and track your delivery — all from your phone.",          cta: "Shop Now",       route: "/cart",    img: hero5, overlay: OVERLAY, accent: "#EAF3FF", badge: BADGE },
 ];
 
 // ── Category pills ─────────────────────────────────────────────────────────────
@@ -273,18 +235,8 @@ function HeroCarousel() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
-// PRODUCT IMAGES — real Unsplash product photos mapped by product id
+// PRODUCT IMAGES sourced from demo-data (PRODUCT_IMAGE)
 // ════════════════════════════════════════════════════════════════════════════════
-export const PRODUCT_IMAGES: Record<string, string> = {
-  p1: prodParacetamol,
-  p2: prodAmoxicillin,
-  p3: prodVitC,
-  p4: prodFormula,
-  p5: prodBP,
-  p6: prodIbuprofen,
-  p7: prodLotion,
-  p8: prodGlucose,
-};
 
 // ════════════════════════════════════════════════════════════════════════════════
 // HOME PAGE
@@ -365,8 +317,8 @@ function Home() {
           </button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {PRODUCTS.map((p, i) => (
-            <ProductCard key={p.id} p={p} i={i} imageUrl={PRODUCT_IMAGES[p.id]} />
+          {FEATURED_PRODUCTS.map((p, i) => (
+            <ProductCard key={p.id} p={p} i={i} imageUrl={PRODUCT_IMAGE[p.id]} />
           ))}
         </div>
       </div>
