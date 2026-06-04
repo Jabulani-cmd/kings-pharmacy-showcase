@@ -1,37 +1,37 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { ShoppingCart, Bell, Upload } from "lucide-react";
-import { useCart } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import type { Product } from "@/lib/store";
 
 type Props = {
   p: Product;
-  i: number;
+  i?: number;
   imageUrl?: string;
 };
 
 const STATUS = {
-  "in-stock": { label: "In Stock", dot: "#1A7A4A", bg: "#E6F4EC", text: "#1A7A4A" },
-  "low-stock": { label: "Low Stock", dot: "#C47B10", bg: "#FEF3DC", text: "#C47B10" },
-  "out-of-stock": { label: "Out of Stock", dot: "#C0392B", bg: "#FDECEA", text: "#C0392B" },
-  "rx-required": { label: "Rx Required", dot: "#1E5BC6", bg: "#EEF4FF", text: "#1E5BC6" },
-  "branch-only": { label: "Branch Only", dot: "#6C7A89", bg: "#F0F2F5", text: "#6C7A89" },
-};
+  in: { label: "In Stock", dot: "#1A7A4A", bg: "#E6F4EC", text: "#1A7A4A" },
+  low: { label: "Low Stock", dot: "#C47B10", bg: "#FEF3DC", text: "#C47B10" },
+  out: { label: "Out of Stock", dot: "#C0392B", bg: "#FDECEA", text: "#C0392B" },
+  rx: { label: "Rx Required", dot: "#1E5BC6", bg: "#EEF4FF", text: "#1E5BC6" },
+  branch: { label: "Branch Only", dot: "#6C7A89", bg: "#F0F2F5", text: "#6C7A89" },
+} as const;
 
-export function ProductCard({ p, i, imageUrl }: Props) {
+export function ProductCard({ p, i = 0, imageUrl }: Props) {
   const navigate = useNavigate();
-  const { addItem } = useCart();
-  const status = STATUS[p.status] ?? STATUS["in-stock"];
-  const canBuy = p.status !== "out-of-stock";
-  const isRx = p.status === "rx-required";
+  const add = useStore((s) => s.add);
+  const status = STATUS[p.stock] ?? STATUS.in;
+  const isRx = p.stock === "rx";
+  const isOut = p.stock === "out";
 
   function handleCTA(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!canBuy) return;
+    if (isOut) return;
     if (isRx) {
-      navigate({ to: `/product/${p.id}?action=upload-rx` });
+      navigate({ to: `/product/${p.id}`, search: { action: "upload-rx" } as never });
     } else {
-      addItem(p);
+      add(p.id, 1);
     }
   }
 
@@ -50,7 +50,6 @@ export function ProductCard({ p, i, imageUrl }: Props) {
                  hover:border-[#1E5BC6] hover:shadow-lg hover:-translate-y-0.5
                  active:scale-[0.98] transition-all duration-200 cursor-pointer flex flex-col"
     >
-      {/* Product Image */}
       <div className="relative overflow-hidden bg-slate-50" style={{ aspectRatio: "4/3" }}>
         {imageUrl ? (
           <img
@@ -60,14 +59,14 @@ export function ProductCard({ p, i, imageUrl }: Props) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-100">💊</div>
+          <div className="w-full h-full flex items-center justify-center text-5xl" style={{ background: p.color }}>{p.emoji}</div>
         )}
-        {p.status === "low-stock" && p.stock !== undefined && (
+        {p.stock === "low" && p.stockCount !== undefined && (
           <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 shadow">
-            Only {p.stock} left
+            Only {p.stockCount} left
           </div>
         )}
-        {p.status === "out-of-stock" && (
+        {isOut && (
           <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
             <span className="bg-white/90 text-slate-500 text-xs font-bold rounded-full px-3 py-1 shadow">
               Out of Stock
@@ -76,7 +75,6 @@ export function ProductCard({ p, i, imageUrl }: Props) {
         )}
       </div>
 
-      {/* Card Body */}
       <div className="flex flex-col flex-1 p-3 md:p-4 gap-2">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 truncate">{p.brand}</p>
         <h3 className="text-sm font-bold text-[#1B3A6B] leading-tight line-clamp-2 min-h-[2.4em]">{p.name}</h3>
@@ -94,7 +92,7 @@ export function ProductCard({ p, i, imageUrl }: Props) {
           <span className="text-slate-400 text-xs">USD</span>
         </div>
 
-        {p.status === "out-of-stock" ? (
+        {isOut ? (
           <button
             onClick={handleNotify}
             className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold
