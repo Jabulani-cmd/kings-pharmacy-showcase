@@ -221,14 +221,18 @@ const methods: { id: PayMethod; name: string; icon: string; iconBg: string; curr
   { id: "cod", name: "Cash on Delivery", icon: "💰", iconBg: "#C49A2C", currency: "ZiG / USD", desc: "Pay the driver when your order arrives." },
 ];
 
-function Payment({ next }: { next: () => void }) {
-  const [sel, setSel] = useState<PayMethod | null>(null);
+function Payment({ selected, setSelected, next }: { selected: string; setSelected: (m: string) => void; next: () => void }) {
+  const [sel, setSel] = useState<PayMethod | null>(() => methods.find((m) => m.name === selected)?.id ?? null);
+  function choose(id: PayMethod) {
+    setSel(id);
+    setSelected(methods.find((m) => m.id === id)!.name);
+  }
   return (
     <div className="grid md:grid-cols-5 gap-4 max-w-4xl mx-auto">
       <div className="md:col-span-3 space-y-2">
         <div className="font-black text-[#1B3A6B] text-lg mb-2">Choose Payment</div>
         {methods.map((m) => (
-          <button key={m.id} onClick={() => setSel(m.id)} className={`w-full text-left bg-white rounded-2xl p-3 flex items-center gap-3 border-2 transition ${sel === m.id ? "border-[#1E5BC6] shadow-md" : "border-transparent hover:border-border"}`}>
+          <button key={m.id} onClick={() => choose(m.id)} className={`w-full text-left bg-white rounded-2xl p-3 flex items-center gap-3 border-2 transition ${sel === m.id ? "border-[#1E5BC6] shadow-md" : "border-transparent hover:border-border"}`}>
             <div className="h-11 w-11 rounded-xl flex items-center justify-center text-xl shrink-0" style={{ background: m.iconBg + "22", color: m.iconBg }}>{m.icon}</div>
             <div className="flex-1 min-w-0">
               <div className="font-bold text-sm text-[#1B3A6B]">{m.name} <span className="text-[10px] font-semibold text-muted-foreground ml-1">{m.currency}</span></div>
@@ -247,6 +251,7 @@ function Payment({ next }: { next: () => void }) {
     </div>
   );
 }
+
 
 function PayForm({ method, onSuccess }: { method: typeof methods[0]; onSuccess: () => void }) {
   const [phase, setPhase] = useState<"form" | "otp" | "processing" | "success">("form");
