@@ -1,48 +1,136 @@
-import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { useStore, type Product } from "@/lib/store";
-import { StockBadge } from "./stock-badge";
-import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
+import { ShoppingCart, Bell, Upload } from "lucide-react";
+import { useCart } from "@/lib/store";
 
-export function ProductCard({ p, i = 0 }: { p: Product; i?: number }) {
-  const add = useStore((s) => s.add);
-  const [notified, setNotified] = useState(false);
-  const disabled = p.stock === "out";
+type Product = {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  status: "in-stock" | "low-stock" | "out-of-stock" | "rx-required" | "branch-only";
+  category: string;
+  description?: string;
+  stock?: number;
+};
+
+type Props = {
+  p: Product;
+  i: number;
+  imageUrl?: string;
+};
+
+const STATUS = {
+  "in-stock": { label: "In Stock", dot: "#1A7A4A", bg: "#E6F4EC", text: "#1A7A4A" },
+  "low-stock": { label: "Low Stock", dot: "#C47B10", bg: "#FEF3DC", text: "#C47B10" },
+  "out-of-stock": { label: "Out of Stock", dot: "#C0392B", bg: "#FDECEA", text: "#C0392B" },
+  "rx-required": { label: "Rx Required", dot: "#1E5BC6", bg: "#EEF4FF", text: "#1E5BC6" },
+  "branch-only": { label: "Branch Only", dot: "#6C7A89", bg: "#F0F2F5", text: "#6C7A89" },
+};
+
+export function ProductCard({ p, i, imageUrl }: Props) {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+  const status = STATUS[p.status] ?? STATUS["in-stock"];
+  const canBuy = p.status !== "out-of-stock";
+  const isRx = p.status === "rx-required";
+
+  function handleCTA(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!canBuy) return;
+    if (isRx) {
+      navigate({ to: `/product/${p.id}?action=upload-rx` });
+    } else {
+      addItem(p);
+    }
+  }
+
+  function handleNotify(e: React.MouseEvent) {
+    e.stopPropagation();
+    alert(`We'll notify you when ${p.name} is back in stock!`);
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: i * 0.04, duration: 0.3 }}
-      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border flex flex-col"
+      transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      onClick={() => navigate({ to: `/product/${p.id}` })}
+      className="group relative bg-white rounded-2xl border border-slate-200 overflow-hidden
+                 hover:border-[#1E5BC6] hover:shadow-lg hover:-translate-y-0.5
+                 active:scale-[0.98] transition-all duration-200 cursor-pointer flex flex-col"
     >
-      <Link to="/product/$id" params={{ id: p.id }} className="block">
-        <div className="aspect-square flex items-center justify-center text-6xl" style={{ background: p.color }}>
-          {p.emoji}
+      {/* Product Image */}
+      <div className="relative overflow-hidden bg-slate-50" style={{ aspectRatio: "4/3" }}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={p.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-100">💊</div>
+        )}
+        {p.status === "low-stock" && p.stock !== undefined && (
+          <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 shadow">
+            Only {p.stock} left
+          </div>
+        )}
+        {p.status === "out-of-stock" && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="bg-white/90 text-slate-500 text-xs font-bold rounded-full px-3 py-1 shadow">
+              Out of Stock
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Card Body */}
+      <div className="flex flex-col flex-1 p-3 md:p-4 gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 truncate">{p.brand}</p>
+        <h3 className="text-sm font-bold text-[#1B3A6B] leading-tight line-clamp-2 min-h-[2.4em]">{p.name}</h3>
+
+        <span
+          className="self-start inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold"
+          style={{ background: status.bg, color: status.text }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: status.dot }} />
+          {status.label}
+        </span>
+
+        <div className="flex items-baseline gap-1 mt-auto">
+          <span className="text-[#1B3A6B] font-black text-base">${p.price.toFixed(2)}</span>
+          <span className="text-slate-400 text-xs">USD</span>
         </div>
-      </Link>
-      <div className="p-3 flex-1 flex flex-col gap-2">
-        <div><StockBadge stock={p.stock} count={p.stockCount} /></div>
-        <Link to="/product/$id" params={{ id: p.id }} className="font-semibold text-sm leading-tight line-clamp-2 hover:text-[#1E5BC6]">{p.name}</Link>
-        {p.brand && <div className="text-xs text-muted-foreground -mt-1">{p.brand}</div>}
-        <div className="flex items-baseline justify-between mt-auto">
-          <div className="text-lg font-black text-[#1B3A6B]">${p.price.toFixed(2)}</div>
-        </div>
-        {p.stock === "out" ? (
+
+        {p.status === "out-of-stock" ? (
           <button
-            onClick={() => { setNotified(true); toast.success("We'll notify you when back in stock"); }}
-            className="w-full rounded-lg py-2 text-xs font-bold border-2 border-[#1B3A6B] text-[#1B3A6B] hover:bg-[#1B3A6B] hover:text-white transition"
+            onClick={handleNotify}
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold
+                       border-2 border-slate-200 text-slate-500 hover:border-[#1B3A6B] hover:text-[#1B3A6B]
+                       hover:bg-slate-50 active:scale-95 transition-all duration-150 focus:outline-none"
           >
-            {notified ? "✓ You'll be notified" : "🔔 Notify Me"}
+            <Bell size={13} /> Notify Me
+          </button>
+        ) : isRx ? (
+          <button
+            onClick={handleCTA}
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold
+                       bg-[#EEF4FF] text-[#1E5BC6] border-2 border-[#1E5BC6]/30
+                       hover:bg-[#1E5BC6] hover:text-white hover:border-[#1E5BC6]
+                       active:scale-95 transition-all duration-150 focus:outline-none"
+          >
+            <Upload size={13} /> Upload Rx
           </button>
         ) : (
           <button
-            disabled={disabled}
-            onClick={() => { add(p.id); toast.success(`${p.name} added to cart`); }}
-            className="w-full rounded-lg py-2 text-xs font-bold bg-[#1B3A6B] text-white hover:bg-[#1E5BC6] transition disabled:opacity-50"
+            onClick={handleCTA}
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold
+                       bg-[#1B3A6B] text-white hover:bg-[#1E5BC6] hover:shadow-md
+                       active:scale-95 transition-all duration-150 focus:outline-none"
           >
-            {p.stock === "rx" ? "Add (Rx)" : "Add to Cart"}
+            <ShoppingCart size={13} /> Add to Cart
           </button>
         )}
       </div>
