@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Upload, FileText, X, Check, ChevronRight, ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
+import { CameraCapture } from "@/components/camera-capture";
 import { useAuth } from "@/lib/auth";
 import { useRx, RX_PROGRESS, statusColor, type RxRecord } from "@/lib/rx";
 import { toast } from "sonner";
@@ -96,7 +97,7 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
     notes: "",
   });
   const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   function onFile(f: File | null) {
     if (!f) return;
@@ -149,23 +150,15 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
       {step === "capture" && (
         <div className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-3">
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              hidden
-              onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-            />
             <button
-              onClick={() => cameraRef.current?.click()}
+              onClick={() => setCameraOpen(true)}
               className="bg-white border-2 border-dashed border-[#1E5BC6]/40 hover:border-[#1E5BC6] rounded-2xl p-6 flex flex-col items-center justify-center gap-2 transition group"
             >
               <div className="h-12 w-12 rounded-full bg-[#EAF3FF] flex items-center justify-center group-hover:bg-[#1E5BC6] group-hover:text-white text-[#1E5BC6] transition">
                 <Camera className="h-6 w-6" />
               </div>
               <div className="font-bold text-[#1B3A6B]">Take a Photo</div>
-              <div className="text-xs text-slate-500 text-center">Use your phone camera</div>
+              <div className="text-xs text-slate-500 text-center">Use your camera live</div>
             </button>
 
             <input
@@ -238,6 +231,16 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
           <Loader2 className="h-10 w-10 animate-spin text-[#1E5BC6] mx-auto" />
           <div className="mt-3 font-bold text-[#1B3A6B]">Submitting prescription…</div>
         </div>
+      )}
+
+      {cameraOpen && (
+        <CameraCapture
+          onClose={() => setCameraOpen(false)}
+          onCapture={(url, name) => {
+            setImage({ url, name, type: "image/jpeg" });
+            setCameraOpen(false);
+          }}
+        />
       )}
     </div>
   );
