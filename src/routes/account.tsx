@@ -57,20 +57,8 @@ function Account() {
         ))}
       </Section>
 
-      <Section title="My Prescriptions" icon={FileText}>
-        {[
-          { name: "Amoxicillin 250mg", date: "Today, 10:42", status: "Under Review 🔄", color: "#C47B10" },
-          { name: "Metformin 500mg", date: "Mar 12", status: "Approved ✅", color: "#1A7A4A" },
-        ].map((p) => (
-          <Row key={p.name}>
-            <div>
-              <div className="font-bold text-sm text-[#1B3A6B]">{p.name}</div>
-              <div className="text-xs text-muted-foreground">Uploaded {p.date}</div>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-1 rounded-full text-white" style={{ background: p.color }}>{p.status}</span>
-          </Row>
-        ))}
-      </Section>
+      <MyPrescriptions />
+
 
       <Section title="Health Profile" icon={Heart}>
         <Row><div><div className="text-xs text-muted-foreground">Allergies</div><div className="font-bold text-sm text-[#1B3A6B]">Penicillin</div></div></Row>
