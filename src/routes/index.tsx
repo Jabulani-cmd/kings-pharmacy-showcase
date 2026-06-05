@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
-import { FEATURED_PRODUCTS, PRODUCT_IMAGE } from "@/lib/demo-data";
+import { FEATURED_PRODUCTS, NEW_ARRIVALS, PRODUCT_IMAGE } from "@/lib/demo-data";
 import { ProductCard } from "@/components/product-card";
 import { ChevronLeft, ChevronRight, ArrowRight, Truck, Zap, HeartHandshake, Pill, Smartphone } from "lucide-react";
 import logoAsset from "@/assets/kings-logo.webp.asset.json";
