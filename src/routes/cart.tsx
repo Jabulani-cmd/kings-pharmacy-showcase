@@ -98,7 +98,7 @@ function CartFlow() {
         <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
           {step === 0 && <CartReview next={() => setStep(1)} />}
           {step === 1 && <Delivery info={deliveryInfo} setInfo={setDeliveryInfo} next={() => setStep(2)} />}
-          {step === 2 && <Payment selected={payMethod} setSelected={setPayMethod} next={handlePlaceOrder} />}
+          {step === 2 && <Payment selected={payMethod} setSelected={setPayMethod} next={handlePlaceOrder} total={cartSubtotal(cart) + 2.5} />}
           {step === 3 && <Confirmed orderId={placedId} />}
         </motion.div>
       </AnimatePresence>
@@ -221,7 +221,7 @@ const methods: { id: PayMethod; name: string; icon: string; iconBg: string; curr
   { id: "cod", name: "Cash on Delivery", icon: "💰", iconBg: "#C49A2C", currency: "ZiG / USD", desc: "Pay the driver when your order arrives." },
 ];
 
-function Payment({ selected, setSelected, next }: { selected: string; setSelected: (m: string) => void; next: () => void }) {
+function Payment({ selected, setSelected, next, total }: { selected: string; setSelected: (m: string) => void; next: () => void; total: number }) {
   const [sel, setSel] = useState<PayMethod | null>(() => methods.find((m) => m.name === selected)?.id ?? null);
   function choose(id: PayMethod) {
     setSel(id);
@@ -245,7 +245,7 @@ function Payment({ selected, setSelected, next }: { selected: string; setSelecte
       <div className="md:col-span-2">
         <div className="bg-white rounded-2xl p-5 sticky top-20">
           {!sel && <div className="text-sm text-muted-foreground text-center py-10">Select a payment method to continue</div>}
-          {sel && <PayForm method={methods.find((m) => m.id === sel)!} onSuccess={next} />}
+          {sel && <PayForm method={methods.find((m) => m.id === sel)!} onSuccess={next} total={total} />}
         </div>
       </div>
     </div>
@@ -253,7 +253,8 @@ function Payment({ selected, setSelected, next }: { selected: string; setSelecte
 }
 
 
-function PayForm({ method, onSuccess }: { method: typeof methods[0]; onSuccess: () => void }) {
+function PayForm({ method, onSuccess, total }: { method: typeof methods[0]; onSuccess: () => void; total: number }) {
+  const amt = `$${total.toFixed(2)}`;
   const [phase, setPhase] = useState<"form" | "otp" | "processing" | "success">("form");
   const isMobile = ["ecocash", "onemoney", "telecash", "innbucks"].includes(method.id);
 
@@ -291,7 +292,7 @@ function PayForm({ method, onSuccess }: { method: typeof methods[0]; onSuccess: 
               <input key={i} maxLength={1} defaultValue={[1,2,3,4,5,6][i]} className="h-11 w-9 text-center font-black text-lg rounded-lg border-2 border-[#1E5BC6] outline-none" />
             ))}
           </div>
-          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold">Verify & Pay $26.30</button>
+          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold">Verify & Pay {amt}</button>
         </>
       )}
       {phase === "form" && method.id === "zipit" && (
@@ -309,12 +310,12 @@ function PayForm({ method, onSuccess }: { method: typeof methods[0]; onSuccess: 
           <div className="grid grid-cols-2 gap-2"><Field label="Expiry" placeholder="MM/YY" /><Field label="CVV" placeholder="123" /></div>
           <Field label="Cardholder Name" v="Chipo Moyo" />
           <Field label="Billing Address" v="14 Samora Machel Ave, Harare" />
-          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold flex items-center justify-center gap-2"><Lock className="h-4 w-4" /> Pay Securely $26.30</button>
+          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold flex items-center justify-center gap-2"><Lock className="h-4 w-4" /> Pay Securely {amt}</button>
         </>
       )}
       {phase === "form" && method.id === "cod" && (
         <>
-          <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">Have $26.30 ready for the driver on delivery.</div>
+          <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">Have {amt} ready for the driver on delivery.</div>
           <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold">Confirm Order</button>
         </>
       )}
