@@ -282,7 +282,7 @@ function Detail({ rec, onBack }: { rec: RxRecord; onBack: () => void }) {
         </div>
       </div>
 
-      {(rec.status === "Info Requested" || rec.status === "Rejected") && rec.reviewerNote && (
+      {rec.quotation && <QuotationPanel rec={rec} />}
         <div className={`rounded-2xl p-4 border ${rec.status === "Rejected" ? "border-red-200 bg-red-50 text-red-900" : "border-amber-200 bg-amber-50 text-amber-900"}`}>
           <div className="font-bold text-sm">Message from pharmacist</div>
           <div className="text-sm mt-1">{rec.reviewerNote}</div>
