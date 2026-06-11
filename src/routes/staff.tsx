@@ -246,7 +246,7 @@ function RxManagement() {
             Select a prescription to review.
           </div>
         ) : (
-          <RxDetailPanel key={rec.id} rec={rec} onAction={(status, note) => { setStatus(rec.id, status, note); toast.success(`Prescription ${status.toLowerCase()}.`); }} />
+          <RxDetailPanel key={rec.id} rec={rec} />
         )}
       </div>
     </div>
