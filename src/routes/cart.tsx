@@ -292,22 +292,13 @@ function PayForm({ method, onSuccess, total }: { method: typeof methods[0]; onSu
           <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold">Verify & Pay {amt}</button>
         </>
       )}
-      {phase === "form" && method.id === "zipit" && (
+      {phase === "form" && method.id === "zimswitch" && (
         <>
           <label className="block"><span className="text-xs font-bold text-[#1B3A6B]">Bank</span>
             <select className="mt-1 w-full h-11 rounded-lg border border-border px-3 text-sm"><option>CBZ Bank</option><option>Stanbic</option><option>FBC</option><option>Steward Bank</option></select>
           </label>
-          <Field label="Account Number" placeholder="00112233445" />
-          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold">Confirm Transfer</button>
-        </>
-      )}
-      {phase === "form" && method.id === "card" && (
-        <>
-          <CardNumber />
-          <div className="grid grid-cols-2 gap-2"><Field label="Expiry" placeholder="MM/YY" /><Field label="CVV" placeholder="123" /></div>
-          <Field label="Cardholder Name" v="Chipo Moyo" />
-          <Field label="Billing Address" v="14 Samora Machel Ave, Harare" />
-          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold flex items-center justify-center gap-2"><Lock className="h-4 w-4" /> Pay Securely {amt}</button>
+          <Field label="Card / Account Number" placeholder="00112233445" />
+          <button onClick={submit} className="w-full h-11 rounded-full bg-[#1B3A6B] text-white font-bold flex items-center justify-center gap-2"><Lock className="h-4 w-4" /> Confirm Transfer {amt}</button>
         </>
       )}
       {phase === "form" && method.id === "cod" && (
