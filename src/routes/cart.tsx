@@ -253,7 +253,7 @@ function Payment({ selected, setSelected, next, total }: { selected: string; set
 function PayForm({ method, onSuccess, total }: { method: typeof methods[0]; onSuccess: () => void; total: number }) {
   const amt = `$${total.toFixed(2)}`;
   const [phase, setPhase] = useState<"form" | "otp" | "processing" | "success">("form");
-  const isMobile = ["ecocash", "onemoney", "telecash", "innbucks"].includes(method.id);
+  const isMobile = ["ecocash", "telecash"].includes(method.id);
 
   function submit() {
     if (isMobile && phase === "form") return setPhase("otp");
