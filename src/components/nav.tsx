@@ -163,7 +163,7 @@ export function MobileHeader() {
   const count = useStore((s) => cartCount(s.cart));
   return (
     <header className="md:hidden sticky top-0 z-40 bg-white border-b border-border shadow-sm">
-      <div className="px-3 h-16 flex items-center gap-2">
+      <div className="px-3 pt-2 pb-1 flex items-center gap-2">
         <Link to="/" className="shrink-0">
           <Logo compact />
         </Link>
@@ -182,6 +182,9 @@ export function MobileHeader() {
             </span>
           )}
         </Link>
+      </div>
+      <div className="px-3 pb-2 flex">
+        <BranchChip compact />
       </div>
     </header>
   );
