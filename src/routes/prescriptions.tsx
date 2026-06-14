@@ -210,6 +210,11 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
       {step === "details" && image && (
         <div className="space-y-3 bg-white rounded-2xl p-5 border border-slate-200">
           <img src={image.url} alt="" className="w-full max-h-44 object-contain rounded-xl bg-slate-50" />
+          <div className="flex items-center gap-2 text-xs bg-[#EAF3FF] border border-[#1E5BC6]/20 text-[#1B3A6B] rounded-lg px-3 py-2">
+            <MapPin className="h-3.5 w-3.5 text-[#1E5BC6]" />
+            <span className="font-bold">Branch:</span>
+            <span>{branch ? branch.name : "No branch selected — choose one from the header"}</span>
+          </div>
           <Field label="Patient Name" value={form.patientName} onChange={(v) => setForm({ ...form, patientName: v })} />
           <Field label="Contact Number" value={form.contactPhone} onChange={(v) => setForm({ ...form, contactPhone: v })} />
           <Field label="Delivery Address" value={form.deliveryAddress} onChange={(v) => setForm({ ...form, deliveryAddress: v })} />
