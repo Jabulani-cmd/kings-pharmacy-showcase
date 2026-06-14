@@ -89,6 +89,8 @@ function Prescriptions() {
 function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; onCancel: () => void }) {
   const user = useAuth((s) => s.user)!;
   const submit = useRx((s) => s.submit);
+  const selectedBranchId = useBranch((s) => s.selectedId);
+  const branch = getBranch(selectedBranchId);
   const [step, setStep] = useState<"capture" | "details" | "submitting">("capture");
   const [image, setImage] = useState<{ url: string; name: string; type: string } | null>(null);
   const [form, setForm] = useState({
@@ -135,6 +137,7 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
         imageDataUrl: image.url,
         fileName: image.name,
         fileType: image.type,
+        branchId: selectedBranchId ?? undefined,
       });
       toast.success("Prescription received — a pharmacist will review it shortly.");
       onDone(rec.id);
