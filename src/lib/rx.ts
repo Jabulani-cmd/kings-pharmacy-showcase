@@ -64,6 +64,7 @@ export interface RxRecord {
   reviewerNote?: string;
   quotation?: Quotation;
   branchId?: string;
+  deliveryTimeSlot?: string;
 }
 
 // ── Placeholder prescription images (SVG data URLs, look like Rx slips) ─────
