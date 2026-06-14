@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TopNav, MobileHeader, BottomTabs, DemoBadge } from "@/components/nav";
-import { BranchPicker } from "@/components/branch-picker";
+import { useBranch, BRANCHES } from "@/lib/branches";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -118,6 +118,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const selectedBranchId = useBranch((s) => s.selectedId);
+  const setBranch = useBranch((s) => s.setBranch);
+
+  // Default to first branch on first visit (never block the page with a modal)
+  useEffect(() => {
+    if (!selectedBranchId && BRANCHES[0]) setBranch(BRANCHES[0].id);
+  }, [selectedBranchId, setBranch]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -128,7 +135,6 @@ function RootComponent() {
       </main>
       <BottomTabs />
       <DemoBadge />
-      <BranchPicker />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );

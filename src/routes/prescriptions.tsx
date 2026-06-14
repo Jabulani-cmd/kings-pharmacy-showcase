@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, FileText, X, Check, ChevronRight, ArrowLeft, ImagePlus, Loader2 } from "lucide-react";
+import { Camera, Upload, FileText, X, Check, ChevronRight, ArrowLeft, ImagePlus, Loader2, MapPin, Clock } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { CameraCapture } from "@/components/camera-capture";
 import { useAuth } from "@/lib/auth";
 import { useRx, RX_PROGRESS, statusColor, type RxRecord } from "@/lib/rx";
+import { useBranch, getBranch } from "@/lib/branches";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/prescriptions")({
@@ -88,6 +89,8 @@ function Prescriptions() {
 function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; onCancel: () => void }) {
   const user = useAuth((s) => s.user)!;
   const submit = useRx((s) => s.submit);
+  const selectedBranchId = useBranch((s) => s.selectedId);
+  const branch = getBranch(selectedBranchId);
   const [step, setStep] = useState<"capture" | "details" | "submitting">("capture");
   const [image, setImage] = useState<{ url: string; name: string; type: string } | null>(null);
   const [form, setForm] = useState({
@@ -134,6 +137,7 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
         imageDataUrl: image.url,
         fileName: image.name,
         fileType: image.type,
+        branchId: selectedBranchId ?? undefined,
       });
       toast.success("Prescription received — a pharmacist will review it shortly.");
       onDone(rec.id);
@@ -206,6 +210,11 @@ function NewPrescription({ onDone, onCancel }: { onDone: (id: string) => void; o
       {step === "details" && image && (
         <div className="space-y-3 bg-white rounded-2xl p-5 border border-slate-200">
           <img src={image.url} alt="" className="w-full max-h-44 object-contain rounded-xl bg-slate-50" />
+          <div className="flex items-center gap-2 text-xs bg-[#EAF3FF] border border-[#1E5BC6]/20 text-[#1B3A6B] rounded-lg px-3 py-2">
+            <MapPin className="h-3.5 w-3.5 text-[#1E5BC6]" />
+            <span className="font-bold">Branch:</span>
+            <span>{branch ? branch.name : "No branch selected — choose one from the header"}</span>
+          </div>
           <Field label="Patient Name" value={form.patientName} onChange={(v) => setForm({ ...form, patientName: v })} />
           <Field label="Contact Number" value={form.contactPhone} onChange={(v) => setForm({ ...form, contactPhone: v })} />
           <Field label="Delivery Address" value={form.deliveryAddress} onChange={(v) => setForm({ ...form, deliveryAddress: v })} />
@@ -312,9 +321,13 @@ function Detail({ rec, onBack }: { rec: RxRecord; onBack: () => void }) {
         <Detail2 k="Patient" v={rec.patientName} />
         <Detail2 k="Phone" v={rec.contactPhone} />
         <Detail2 k="Address" v={rec.deliveryAddress} />
+        {rec.branchId && <Detail2 k="Branch" v={getBranch(rec.branchId)?.name ?? rec.branchId} />}
+        {rec.deliveryTimeSlot && <Detail2 k="Delivery slot" v={rec.deliveryTimeSlot} />}
         {rec.doctor && <Detail2 k="Doctor" v={rec.doctor} />}
         {rec.notes && <Detail2 k="Notes" v={rec.notes} />}
       </div>
+
+      {rec.quotation?.paidAt && !rec.deliveryTimeSlot && <DeliverySlotPicker rxId={rec.id} />}
 
       <AnimatePresence>
         {zoom && (
@@ -392,6 +405,49 @@ function QuotationPanel({ rec }: { rec: RxRecord }) {
       {paid && (
         <div className="mt-3 text-xs text-emerald-700 font-bold">✓ Paid via {q.paymentMethod} · {new Date(q.paidAt!).toLocaleString()}</div>
       )}
+    </div>
+  );
+}
+
+const DELIVERY_SLOTS = [
+  "Today · 12:00 – 2:00 PM",
+  "Today · 2:00 – 4:00 PM",
+  "Today · 4:00 – 6:00 PM",
+  "Tomorrow · 9:00 – 11:00 AM",
+  "Tomorrow · 11:00 AM – 1:00 PM",
+  "Tomorrow · 2:00 – 4:00 PM",
+];
+
+function DeliverySlotPicker({ rxId }: { rxId: string }) {
+  const setDeliveryTimeSlot = useRx((s) => s.setDeliveryTimeSlot);
+  const [slot, setSlot] = useState<string>(DELIVERY_SLOTS[0]);
+  function confirm() {
+    setDeliveryTimeSlot(rxId, slot);
+    toast.success(`Delivery scheduled · ${slot}`);
+  }
+  return (
+    <div className="bg-white rounded-2xl border border-[#1A7A4A]/30 p-5 shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <Clock className="h-4 w-4 text-[#1A7A4A]" />
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-widest text-[#1A7A4A]">Payment Received</div>
+          <div className="font-black text-lg text-[#1B3A6B]">Choose a delivery time slot</div>
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {DELIVERY_SLOTS.map((s) => (
+          <button
+            key={s}
+            onClick={() => setSlot(s)}
+            className={`text-left h-12 rounded-lg border-2 px-3 text-xs font-bold transition ${slot === s ? "border-[#1A7A4A] bg-emerald-50 text-[#1B3A6B]" : "border-slate-200 text-slate-500 hover:border-slate-300"}`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+      <button onClick={confirm} className="mt-3 w-full h-11 rounded-full bg-[#1A7A4A] hover:bg-emerald-700 text-white font-bold text-sm transition">
+        Confirm delivery slot
+      </button>
     </div>
   );
 }

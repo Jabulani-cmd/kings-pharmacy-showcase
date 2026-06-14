@@ -64,6 +64,7 @@ export interface RxRecord {
   reviewerNote?: string;
   quotation?: Quotation;
   branchId?: string;
+  deliveryTimeSlot?: string;
 }
 
 // ── Placeholder prescription images (SVG data URLs, look like Rx slips) ─────
@@ -143,6 +144,7 @@ interface RxState {
   advance: (id: string) => void;
   sendQuotation: (id: string, items: QuotationItem[], notes?: string) => void;
   payQuotation: (id: string, method: string) => void;
+  setDeliveryTimeSlot: (id: string, slot: string) => void;
 }
 
 let counter = 4000;
@@ -226,6 +228,14 @@ export const useRx = create<RxState>()(
           ),
         }));
       },
+      setDeliveryTimeSlot: (id, slot) =>
+        set((s) => ({
+          list: s.list.map((r) =>
+            r.id === id
+              ? { ...r, deliveryTimeSlot: slot, updatedAt: new Date().toISOString() }
+              : r,
+          ),
+        })),
     }),
     { name: "kp-rx", version: 3 },
   ),
