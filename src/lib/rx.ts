@@ -144,6 +144,7 @@ interface RxState {
   advance: (id: string) => void;
   sendQuotation: (id: string, items: QuotationItem[], notes?: string) => void;
   payQuotation: (id: string, method: string) => void;
+  setDeliveryTimeSlot: (id: string, slot: string) => void;
 }
 
 let counter = 4000;
